@@ -1,5 +1,29 @@
-// const socket = new WebSocket(`ws://${window.location.host}/ws`);
-const socket = new WebSocket("ws://127.0.0.1:8000/ws");
+const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+const socket = new WebSocket(`${wsProtocol}://${window.location.host}/ws`);
+
+function showDownloadNotice(message, level = 'success') {
+    const notice = document.getElementById('download-notice');
+    const noticeBody = document.getElementById('download-notice-body');
+    if (!notice || !noticeBody) return;
+
+    noticeBody.className = `alert alert-${level} mb-0`;
+    noticeBody.textContent = message;
+    notice.style.display = 'block';
+
+    if (level === 'success') {
+        setTimeout(() => {
+            notice.style.display = 'none';
+        }, 5000);
+    }
+}
+
+socket.onopen = function() {
+    console.log('WebSocket connected');
+};
+
+socket.onerror = function() {
+    showDownloadNotice('WebSocket 連線異常，可能無法收到完成通知。', 'warning');
+};
 
 socket.onmessage = function(event) {
     const msg = JSON.parse(event.data);
@@ -25,7 +49,11 @@ socket.onmessage = function(event) {
             if (submitBtn) submitBtn.disabled = false;
             if (footer) footer.classList.add('d-none');
 
-            alert(msg.data); // 顯示彈窗：✅ 下載已完成！
+            showDownloadNotice(msg.data, 'success');
+        } else if (msg.data.includes('❌')) {
+            const submitBtn = document.querySelector('#download-form button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = false;
+            showDownloadNotice(msg.data, 'danger');
         }
     }
 };

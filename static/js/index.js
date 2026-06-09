@@ -144,6 +144,9 @@ downloadForm.addEventListener('submit', async (e) => {
 const syncBtn = document.getElementById('sync-btn');
 const dbStatus = document.getElementById('db-status');
 const fileList = document.getElementById('file-list');
+const pathDisplay = document.getElementById('library-path-display');
+const browseBtn = document.getElementById('browse-path-btn');
+const pathStatus = document.getElementById('path-status');
 
 // 更新側邊欄清單的函式
 async function refreshLibraryStatus() {
@@ -151,9 +154,9 @@ async function refreshLibraryStatus() {
         const response = await fetch('/db/status');
         const data = await response.json();
 
-        // 更新路徑輸入框的值（確保與後端 config 一致）
-        if (pathInput && data.current_path) {
-            pathInput.value = data.current_path;
+        // 更新側邊欄顯示的路徑（確保與後端 config 一致）
+        if (pathDisplay && data.current_path) {
+            pathDisplay.textContent = data.current_path;
         }
 
         dbStatus.innerText = `目前庫中共有 ${data.count || 0} 個檔案`;
@@ -192,10 +195,6 @@ syncBtn.addEventListener('click', async () => {
 
 // 頁面載入後先跑一次狀態更新
 refreshLibraryStatus();
-
-const pathDisplay = document.getElementById('library-path-display');
-const browseBtn = document.getElementById('browse-path-btn');
-const pathStatus = document.getElementById('path-status');
 
 // 選擇資料夾
 browseBtn.addEventListener('click', async () => {

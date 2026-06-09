@@ -178,7 +178,14 @@ def progress_hook(d):
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request, "name": "鐘啓仁"})
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "name": "鐘啓仁",
+            "current_path": current_config["download_dir"],
+        },
+    )
 
 @app.get("/preview")
 async def get_preview(url: str):
